@@ -16,7 +16,7 @@ namespace Test_projet
         {
         }
 
-        // Méthode
+        // Méthode 
         public override int Note()
         {
             return note;

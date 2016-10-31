@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// Cette classe permet 
+
 namespace Test_projet
 {
+    // la classe Student dérive de Person
     public class Student : Person
     {
         //Attribut 
-        //private List<Evaluation> cours;
+        // En général, pour déclarer une liste -> List <int> cours = new List <int> ();
         public List<Evaluation> cours = new List<Evaluation> { };
 
         //Propriété
@@ -33,11 +36,14 @@ namespace Test_projet
         }
 
         //Methode
+        // Ajouter une "evaluation" à la liste cours (qui est de type Evaluation).
         public void AddEvaluation(Evaluation evaluation)
         {
             cours.Add(evaluation);
         }
 
+        // Retourner la moyenne des cotes de la liste cours.
+        // Remarque : Note() est définit dans la classe Evaluation.
         public double Average()
         {
             double sum = 0;
@@ -49,6 +55,7 @@ namespace Test_projet
             return sum / cours.Count();
         }
 
+        // Rédiger le bulletin
         public void Bulletin()
         {
             string Carnet = "";

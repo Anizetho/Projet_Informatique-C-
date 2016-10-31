@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 
+// Cette classe permet d'initialiser les valeurs de  firstname et lastname.
+// Elle permet aussi de renvoyer le nom et le prénom avec la méthode DisplayName().
 
 namespace Test_projet
 {

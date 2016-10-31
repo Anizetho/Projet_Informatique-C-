@@ -34,7 +34,7 @@ namespace Test_projet
 
                     res += "- ";
                     foreach (string value in split)
-                    { res += value + " " ; }
+                    { res +=  value + " " ; }
                     res += "\n";
                     counter++;
                 }

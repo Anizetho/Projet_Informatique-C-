@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// Cette classe permet d'initialiser les valeurs des variables ects, name, code et teacher.
+
 namespace Test_projet
 {
     public class Activity
@@ -12,6 +14,7 @@ namespace Test_projet
         public int ects;
         public string name;
         public string code;
+        // objet de la classe teacher
         public Teacher teacher;
 
         //Propriétés
