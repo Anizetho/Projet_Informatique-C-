@@ -165,16 +165,15 @@ namespace Test_projet
 
                 //Recréation de l'objet teacher
                 String[] data = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(data[1], data[0], int.Parse(data[2]));
+                Teacher Prof = new Teacher(data[0], data[1], int.Parse(data[2]));
 
                 // Création de l'objet grâce aux valeurs données.
                 Activity Cours = new Activity(ECTS, Name, Code, Prof);
 
-                string str = Cours.ECTS + ":" + Cours.Name + ":" + Cours.Code + Prof.Firstname + ":" + "\n";
+                string str = Cours.ECTS + ":" + Cours.Name + ":" + Cours.code + ":" + Prof.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Activity.txt", str);
 
-                Console.WriteLine(Cours);
                 Console.WriteLine("L'activité a bien été créé dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
@@ -182,59 +181,169 @@ namespace Test_projet
             }
             
             // On définit l'évaluation d'un élève.
-            else if (item == "Evaluation")
+            else if (item == "Cote")
             {
                 Console.WriteLine("Créer une évaluation");
+                Console.WriteLine("");
+
+                // On choisit l'étudiant pour lequel ces notes sont données
+                Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n");
+                Console.Write("--> Nom de l'étudiant : ");
+                string nameOfStudent = Console.ReadLine();
+                String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
+                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
+                Console.WriteLine("L'étudiant a bien été trouvé.");
+                Console.WriteLine("");
+
 
                 // On reprend l'activité dans laquelle on souhaite ajouter une cote ou une appréciation
-                Console.WriteLine("Attention !! L'activité doit déjà être encodé ! \n");
-                Console.WriteLine("--> Nom de l'activité : ");
-                string nameactivity = Console.ReadLine();
-                //Recréation de l'objet Activity
-                String[] dataActivity = FindObjectValue("Activity.txt", nameactivity);
+                Console.Write("Veuillez indiquer le nom de l'activité concernée. \nAttention !! L'activité doit déjà être encodée ! \n");
+                Console.Write("--> Nom de l'activité : ");
+                string nameActivity = Console.ReadLine();
+                //Recréation de l'objet Activity 
+                String[] dataActivity = FindObjectValue("Activity.txt", nameActivity);
                 //Recréation de l'objet teacher
                 string teacher = dataActivity[3];
                 String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
+                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
                 Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+                Console.WriteLine("L'activité a bien été trouvée.");
+                Console.WriteLine("");
 
 
                 // On ajoute une cote à cette activité
-                Console.WriteLine("Entrez la cote :");
+                Console.Write("Entrez la cote : ");
                 int points = int.Parse(Console.ReadLine());
-                // Création de d'une cote dans une certaine activité -> Rem. : on doit rentrer une "activity"
+                Console.WriteLine("");
+                // Création d'une cote dans une certaine activité -> Rem. : on doit rentrer une "activity"
                 Cote cotecours = new Cote(cours);
                 cotecours.setNote(points);
 
 
-                // On ajoute une appréciation à cette activité
-                Console.WriteLine("Entrez l'appréciation :");
-                string appreciation = Console.ReadLine();
-                Appreciation apprcours = new Appreciation(cours);
-                apprcours.setAppreciation(appreciation);
-
-
                 // On ajoute la cote/l'appréciation à la liste des cours
-                // On choisit l'étudiant pour lequel ces notes sont données
-                Console.WriteLine("Attention !! Le nom de l'étudiant doit déjà être encodé ! \n");
-                Console.WriteLine("--> Nom de l'étudiant : ");
-                string nameOfStudent = Console.ReadLine();
-                String[] dataStudent = FindObjectValue("Teacher.txt", nameOfStudent);
-                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
                 nameStudent.AddEvaluation(cotecours);
-                nameStudent.AddEvaluation(apprcours);
 
-
-                string str = Cours.ECTS + ":" + Cours.Name + ":" + Cours.Code + Prof.Firstname + ":" + "\n";
+                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
+                string str =  nameStudent.Lastname + ":" + cotecours.Activity.name + ":" + cotecours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
-                WriteFile("Activity.txt", str);
+                WriteFile("Cote.txt", str);
 
-                Console.WriteLine(Cours);
-                Console.WriteLine("L'évaluation a bien été créée dans la base de données.\nVous allez revenir au menu");
+                Console.WriteLine("La cote a bien été créée dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
             }
-            
+
+
+            else if (item == "Appréciation")
+            {
+                Console.WriteLine("Créer une appréciation");
+                Console.WriteLine("");
+
+                // On choisit l'étudiant pour lequel ces notes sont données
+                Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n");
+                Console.Write("--> Nom de l'étudiant : ");
+                string nameOfStudent = Console.ReadLine();
+                String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
+                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
+                Console.WriteLine("L'étudiant a bien été trouvée.");
+                Console.WriteLine("");
+
+
+                // On reprend l'activité dans laquelle on souhaite ajouter une cote ou une appréciation
+                Console.Write("Attention !! L'activité doit déjà être encodé ! \n");
+                Console.Write("--> Nom de l'activité : ");
+                string nameActivity = Console.ReadLine();
+                //Recréation de l'objet Activity 
+                String[] dataActivity = FindObjectValue("Activity.txt", nameActivity);
+                //Recréation de l'objet teacher
+                string teacher = dataActivity[3];
+                String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
+                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+                Console.WriteLine("L'activité a bien été trouvée.");
+                Console.WriteLine("");
+
+
+                // On ajoute une appréciation à cette activité
+                Console.Write("Entrez l'appréciation : ");
+                string appreciation = Console.ReadLine();
+                Appreciation apprcours = new Appreciation(cours);
+                apprcours.setAppreciation(appreciation);
+                Console.WriteLine("");
+
+
+                // On ajoute l'appréciation à la liste des cours
+                nameStudent.AddEvaluation(apprcours);
+
+
+                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
+                string str = nameStudent.Lastname + ":" + apprcours.Activity.name + ":" + cours.teacher.Lastname + ":" + apprcours.Note() + ":" + "\n";                
+                // Ecrire les données dans un fichier texte Activity
+                WriteFile("Appreciation.txt", str);
+
+                Console.WriteLine("L'appréciation a bien été créée dans la base de données.\nVous allez revenir au menu");
+                Console.ReadKey();
+                return;
+            }
+
+
+
+            else if (item == "Bulletin")
+            {
+                Console.WriteLine("Créer un Bulletin");
+                Console.WriteLine("");
+
+                // On choisit l'étudiant pour lequel ces notes sont données
+                Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n");
+                Console.Write("--> Nom de l'étudiant : ");
+                string nameOfStudent = Console.ReadLine();
+                String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
+                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
+                Console.WriteLine("L'étudiant a bien été trouvée.");
+                Console.WriteLine("");
+
+
+                // On reprend la liste des activités auxquelles il a participé. 
+                Console.Write("Attention !! L'activité doit déjà être encodé ! \n");
+                Console.Write("--> Nom de l'activité : ");
+                string nameActivity = Console.ReadLine();
+                //Recréation de l'objet Activity 
+                String[] dataActivity = FindObjectValue("Activity.txt", nameActivity);
+                //Recréation de l'objet teacher
+                string teacher = dataActivity[3];
+                String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
+                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+                Console.WriteLine("L'activité a bien été trouvée.");
+                Console.WriteLine("");
+
+
+                // On ajoute une appréciation à cette activité
+                Console.Write("Entrez l'appréciation : ");
+                string appreciation = Console.ReadLine();
+                Appreciation apprcours = new Appreciation(cours);
+                apprcours.setAppreciation(appreciation);
+                Console.WriteLine("");
+
+
+                // On ajoute l'appréciation à la liste des cours
+                nameStudent.AddEvaluation(apprcours);
+
+                // On crée le bulletin 
+                nameStudent.Bulletin();
+
+
+                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
+                string str = nameStudent.Lastname + ":" + apprcours.Activity.name + ":" + cours.teacher.Lastname + ":" + apprcours.Note() + ":" + "\n";
+                // Ecrire les données dans un fichier texte Activity
+                WriteFile("Appreciation.txt", str);
+
+                Console.WriteLine("L'appréciation a bien été créée dans la base de données.\nVous allez revenir au menu");
+                Console.ReadKey();
+                return;
+            }
+
+
 
             else { Console.Write("Error"); }
         }
@@ -248,27 +357,31 @@ namespace Test_projet
 @"********** Gestion Etablissement **********
 1. Gérer et créer des instances 
 2. Voir les listes déjà faites
-7.Quitter";
+8.Quitter";
 
             string CreaObjet =
 @"********** Création des Objets ********** 
 1. Créer Professeur 
 2. Créer Etudiant
 3. Créer Activité  
-4. Créer Evaluation
-5. Créer bulletin
-6. Revenir a l'acceuil
-7. Quitter";
+4. Créer Cote
+5. Créer Appréciation
+6. Créer bulletin
+
+7. Revenir a l'acceuil
+8. Quitter";
 
             string Listes =
 @"********** Création des Objets ********** 
 1. Listes des professeurs 
 2. Liste des étudiants
 3. Liste des activités  
-4. Liste des évaluations
-5. Liste des bulletins
-6. Revenir a l'acceuil
-7. Quitter";
+4. Liste des cotes
+5. Liste des appréciations
+6. Liste des bulletins
+
+7. Revenir a l'acceuil
+8. Quitter";
 
             try
             {
@@ -310,14 +423,15 @@ namespace Test_projet
                                 Item("Activity");
                                 break;
                             case 4:
-                                Console.WriteLine("Créer une évaluation");
-                                Console.ReadKey();
+                                Item("Cote");
                                 break;
                             case 5:
-                                Console.WriteLine("Créer un bulletin");
-                                Console.ReadKey();
+                                Item("Appréciation");
                                 break;
-                            case 7:
+                            case 6:
+                                Item("Bulletin");
+                                break;
+                            case 8:
                                 break;
                         }
                         goto case 0;
@@ -349,11 +463,29 @@ namespace Test_projet
                                 Console.ReadKey();
                                 break;
 
+                            case 4:
+                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                                ReadFile("Cote.txt");
+                                Console.ReadKey();
+                                break;
+
+                            case 5:
+                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n ");
+                                ReadFile("Appreciation.txt");
+                                Console.ReadKey();
+                                break;
+
                             case 6:
-                                Console.WriteLine("ok");
+                                Console.WriteLine("Voici les différents bulletins : \n");
+                                ReadFile("Bulletin.txt");
+                                Console.ReadKey();
                                 break;
 
                             case 7:
+                                Console.WriteLine("ok");
+                                break;
+
+                            case 8:
                                 return;
 
                         }
