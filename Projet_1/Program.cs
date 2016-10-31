@@ -180,32 +180,61 @@ namespace Test_projet
                 return;
 
             }
-            /*
+            
             // On définit l'évaluation d'un élève.
             else if (item == "Evaluation")
             {
                 Console.WriteLine("Créer une évaluation");
-                //Entrez un objet ?
-                //Appréciation et Note 
-                //Student testE = new Evaluation(Activity);
-                // Création de l'objet grâce aux valeurs données.
-                Evaluation testE = new Evaluation(ECTS, Name, Code, Teacher);
-                string folderName = @"c:\Test_create_folder\";  // Spécifier un nom pour le DOSSIER
-                string subfolderName = "Sous-Dossier";          // Spécifier un nom pour le SOUS-DOSSIER
-                string pathString = System.IO.Path.Combine(folderName, subfolderName);     // Définit le chemin du DOSSIER au SOUS-DOSSIER.
-                System.IO.Directory.CreateDirectory(pathString);                           // Création du chemin du DOSSIER au SOUS-DOSSIER.
-                string fileName = "Student.txt";              // Spécifier un nom pour le fichier
-                pathString = System.IO.Path.Combine(pathString, fileName);                 // Définit le chemin du SOUS-DOSSIER au FICHIER.
-                // Ajouter du nouveau texte à un fichier existant. 
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"c:\Test_create_folder\Sous-Dossier\Student.txt", true))
-                {
-                    file.WriteLine(testA.ECTS + ":" + testA.Name + ":" + testA.Code + ":" + testA.Teacher + ":" + "\n");
-                }
-                Console.WriteLine("L'évaluation a bien été créé dans la base de données.\nVous allez revenir au menu");
+
+                // On reprend l'activité dans laquelle on souhaite ajouter une cote ou une appréciation
+                Console.WriteLine("Attention !! L'activité doit déjà être encodé ! \n");
+                Console.WriteLine("--> Nom de l'activité : ");
+                string nameactivity = Console.ReadLine();
+                //Recréation de l'objet Activity
+                String[] dataActivity = FindObjectValue("Activity.txt", nameactivity);
+                //Recréation de l'objet teacher
+                string teacher = dataActivity[3];
+                String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
+                Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
+                Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+
+
+                // On ajoute une cote à cette activité
+                Console.WriteLine("Entrez la cote :");
+                int points = int.Parse(Console.ReadLine());
+                // Création de d'une cote dans une certaine activité -> Rem. : on doit rentrer une "activity"
+                Cote cotecours = new Cote(cours);
+                cotecours.setNote(points);
+
+
+                // On ajoute une appréciation à cette activité
+                Console.WriteLine("Entrez l'appréciation :");
+                string appreciation = Console.ReadLine();
+                Appreciation apprcours = new Appreciation(cours);
+                apprcours.setAppreciation(appreciation);
+
+
+                // On ajoute la cote/l'appréciation à la liste des cours
+                // On choisit l'étudiant pour lequel ces notes sont données
+                Console.WriteLine("Attention !! Le nom de l'étudiant doit déjà être encodé ! \n");
+                Console.WriteLine("--> Nom de l'étudiant : ");
+                string nameOfStudent = Console.ReadLine();
+                String[] dataStudent = FindObjectValue("Teacher.txt", nameOfStudent);
+                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
+                nameStudent.AddEvaluation(cotecours);
+                nameStudent.AddEvaluation(apprcours);
+
+
+                string str = Cours.ECTS + ":" + Cours.Name + ":" + Cours.Code + Prof.Firstname + ":" + "\n";
+                // Ecrire les données dans un fichier texte Activity
+                WriteFile("Activity.txt", str);
+
+                Console.WriteLine(Cours);
+                Console.WriteLine("L'évaluation a bien été créée dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
             }
-            */
+            
 
             else { Console.Write("Error"); }
         }

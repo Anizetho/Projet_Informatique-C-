@@ -28,84 +28,42 @@ namespace Test_projet
 
 
 
-    /*class Evaluation
+/*using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Labo2
+{
+class MainClass
+{
+
+
+
+    public static void Main(string[] args)
     {
-        //Attribut 
+        Teacher Lurkin = new Teacher("Q.", "Lurkin", 2300);
+        Teacher Calleweart = new Teacher("A.", "Calleweart", 2100);
+        Student Thomas = new Student("Thomas", "Anizet");
 
+        Activity Info = new Activity("Info", "I", 4, Lurkin);
+        Cote InfoThomas= new Cote(Info);
+        InfoThomas.setNote(12);
+        Thomas.addEvaluation(InfoThomas);
 
-        //Constructeur
-        public Activity Activity { get; set; }
+        Activity Thermodynamique = new Activity("Thermodynamique", "TH", 7, Calleweart);
+        Appreciation ThermodynamiqueThomas = new Appreciation(Thermodynamique);
+        ThermodynamiqueThomas.setAppreciation("TB");
+        Thomas.addEvaluation(ThermodynamiqueThomas);
 
-        public Evaluation(Activity activity)
-        {
-            Activity = activity;
-        }
-
-        //Méthode 
-        public virtual int Note()
-        {
-            return -10;
-        }
-    }
-
-    class Cote : Evaluation
-    {
-        //Attribut 
-        private int note;
-
-        //Constructeur 
-        public Cote(Activity activity, int note) : base(activity)
-        {
-            this.note = note;
-        }
-
-        //Méthode
-        public override int Note()
-        {
-            return note;
-        }
-
-        public void setNote(int value)
-        {
-            this.note = value;
-        }
+        Thomas.Bulletin();
+        Console.Read();
 
     }
-
-    class Appreciation : Evaluation
-    {
-        //Attribut 
-        private string appreciation;
-
-        //Constructeur 
-        public Appreciation(Activity activity, string appreciation) : base(activity)
-        {
-            this.appreciation = appreciation;
-        }
-
-        public override int Note()
-        {
-
-            //Dictionary<string, int> conversion = new Dictionary<string, int>() 
-            //{ { "N", 4 }, { "C", 8 }, { "B", 12 }, { "TB", 16 }, { "X", 20 } };
-
-            if (appreciation == "N")
-            { return 4; };
-            if (appreciation == "C")
-            { return 8; };
-            if (appreciation == "B")
-            { return 12; };
-            if (appreciation == "TB")
-            { return 16; };
-            if (appreciation == "X")
-            { return 20; }
-
-            else { return -10; };
-
-
-
-        }
-    }
-    */
+}
+}
+*/
 
 
