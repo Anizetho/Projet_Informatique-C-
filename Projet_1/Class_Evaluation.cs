@@ -17,6 +17,7 @@ namespace Test_projet
             this.Activity = activity;
         }
 
+        // Méthode que l'on peut modifier
         public virtual int Note()
         {
             return -10;

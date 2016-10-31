@@ -16,15 +16,17 @@ namespace Test_projet
         {
         }
 
-        // Méthode 
-        public override int Note()
-        {
-            return note;
-        }
-
+        // Méthode qui permet d'ajouter une note
         public void setNote(int note)
         {
             this.note = note;
+        }
+
+        // Méthode -> Même méthode que dans la classe Evaluation mais modifiée !
+        // Elle retourne dans ce cas-ci une note et non pas -10
+        public override int Note()
+        {
+            return note;
         }
     }
 }

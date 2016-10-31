@@ -16,6 +16,13 @@ namespace Test_projet
         {
         }
 
+        // Méthode qui permet d'ajouter une appréciation
+        public void setAppreciation(string appreciation)
+        {
+            this.appreciation = appreciation;
+        }
+
+        // Méthode modifiée de la classe mère
         public override int Note()
         {
             if (this.appreciation == "N")
@@ -30,11 +37,5 @@ namespace Test_projet
                 return 20;
             else return -10;
         }
-
-        public void setAppreciation(string appreciation)
-        {
-            this.appreciation = appreciation;
-        }
-
     }
 }
