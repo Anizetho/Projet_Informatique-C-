@@ -10,7 +10,7 @@ namespace Test_projet
 {
     class Program
     {
-        
+
         // Méthode "lire un fichier" -> on indique le fichier à lire
         static void ReadFile(string file)
         {
@@ -19,7 +19,7 @@ namespace Test_projet
             {
                 // Lis dans le fichier.
                 String text = @"C:\Test_create_folder\Sous-Dossier\" + file;
-                
+
                 string line = " ";
                 int counter = 0;
                 string res = "";
@@ -34,7 +34,7 @@ namespace Test_projet
 
                     res += "- ";
                     foreach (string value in split)
-                    { res +=  value + " " ; }
+                    { res += value + " "; }
                     res += "\n";
                     counter++;
                 }
@@ -179,7 +179,7 @@ namespace Test_projet
                 return;
 
             }
-            
+
             // On définit l'évaluation d'un élève.
             else if (item == "Cote")
             {
@@ -223,8 +223,8 @@ namespace Test_projet
                 // On ajoute la cote/l'appréciation à la liste des cours
                 nameStudent.AddEvaluation(cotecours);
 
-                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
-                string str =  nameStudent.Lastname + ":" + cotecours.Activity.name + ":" + cotecours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
+                // On souhaite afficher le nom de l'activité, le nom de l'élève, les points dans cette activité et le nom du prof de cette activité.
+                string str = cotecours.Activity.name + ":" +  nameStudent.Lastname + ":" + cotecours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Cote.txt", str);
 
@@ -276,8 +276,8 @@ namespace Test_projet
                 nameStudent.AddEvaluation(apprcours);
 
 
-                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
-                string str = nameStudent.Lastname + ":" + apprcours.Activity.name + ":" + cours.teacher.Lastname + ":" + apprcours.Note() + ":" + "\n";                
+                // On souhaite afficher le nom de l'activité, le nom de l'élève, les points dans cette activité et le nom du prof de cette activité.
+                string str = apprcours.Activity.name + ":" +  nameStudent.Lastname  + ":" + apprcours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Appreciation.txt", str);
 
@@ -290,21 +290,22 @@ namespace Test_projet
 
             else if (item == "Bulletin")
             {
-                Console.WriteLine("Créer un Bulletin");
+                Console.WriteLine("Affichier le Bulletin d'un étudiant");
                 Console.WriteLine("");
 
-                // On choisit l'étudiant pour lequel ces notes sont données
+                // On choisit l'étudiant pour lequel on souhaite voir le bulletin
+                // On récupère l'objet Student
                 Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n");
                 Console.Write("--> Nom de l'étudiant : ");
                 string nameOfStudent = Console.ReadLine();
                 String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
                 Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
-                Console.WriteLine("L'étudiant a bien été trouvée.");
+                Console.WriteLine("L'étudiant a bien été trouvé.");
                 Console.WriteLine("");
 
 
                 // On reprend la liste des activités auxquelles il a participé. 
-                Console.Write("Attention !! L'activité doit déjà être encodé ! \n");
+                Console.Write("Attention !! L'activité doit déjà être encodée ! \n");
                 Console.Write("--> Nom de l'activité : ");
                 string nameActivity = Console.ReadLine();
                 //Recréation de l'objet Activity 
@@ -318,27 +319,46 @@ namespace Test_projet
                 Console.WriteLine("");
 
 
-                // On ajoute une appréciation à cette activité
-                Console.Write("Entrez l'appréciation : ");
-                string appreciation = Console.ReadLine();
+                // On reprend la cote de cette activité
+                String[] dataCote = FindObjectValue("Cote.txt", nameStudent.Lastname);
+                int points = int.Parse(dataCote[2]);
+                // Création d'une cote dans une certaine activité -> Rem. : on doit rentrer une "activity"
+                Cote cotecours = new Cote(cours);
+                cotecours.setNote(points);
+                Console.WriteLine("La cote pour l'activité '" + cours.name + "' a bien été trouvée. --> " + cotecours.Note());
+
+
+                // On reprend l'appréciation de cette activité
+                String[] dataAppreciation = FindObjectValue("Appreciation.txt", nameStudent.Lastname);
+                int appreciation = int.Parse(dataAppreciation[2]);
+                string appreciationletter = "";
+                for(int i=0 ; i<5 ; i++)
+                {
+                    if (appreciation == 4) { appreciationletter = "N"; }
+                    else if (appreciation == 8) { appreciationletter = "C"; }
+                    else if (appreciation == 12) { appreciationletter = "B"; }
+                    else if (appreciation == 16) { appreciationletter = "TB"; }
+                    else if (appreciation == 20) { appreciationletter = "X"; }
+                    else { Console.WriteLine("erreur -> L'Appréciation est introuvable"); }
+                }
                 Appreciation apprcours = new Appreciation(cours);
-                apprcours.setAppreciation(appreciation);
-                Console.WriteLine("");
+                apprcours.setAppreciation(appreciationletter);
+                Console.WriteLine("L'appréciation pour l'activité '" + cours.name + "' a bien été trouvée. --> " + apprcours.Note());
 
 
+
+                // On ajoute la cote à la liste des cours
+                nameStudent.AddEvaluation(cotecours);
                 // On ajoute l'appréciation à la liste des cours
                 nameStudent.AddEvaluation(apprcours);
 
-                // On crée le bulletin 
+
+                // On crée et on affiche le bulletin 
+                Console.WriteLine(" \nEn résumé, voici le buletin de : ");
                 nameStudent.Bulletin();
 
 
-                // On souhaite afficher le nom de l'élève, son activité, le nom du prof de cette activité et les points dans cette activité
-                string str = nameStudent.Lastname + ":" + apprcours.Activity.name + ":" + cours.teacher.Lastname + ":" + apprcours.Note() + ":" + "\n";
-                // Ecrire les données dans un fichier texte Activity
-                WriteFile("Appreciation.txt", str);
-
-                Console.WriteLine("L'appréciation a bien été créée dans la base de données.\nVous allez revenir au menu");
+                Console.WriteLine("Voici toutes les infos dont nous disposons actuellement.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
             }
@@ -366,21 +386,20 @@ namespace Test_projet
 3. Créer Activité  
 4. Créer Cote
 5. Créer Appréciation
-6. Créer bulletin
 
-7. Revenir a l'acceuil
+7. Revenir à l'acceuil
 8. Quitter";
 
             string Listes =
 @"********** Création des Objets ********** 
-1. Listes des professeurs 
+1. Liste des professeurs 
 2. Liste des étudiants
 3. Liste des activités  
 4. Liste des cotes
 5. Liste des appréciations
 6. Liste des bulletins
 
-7. Revenir a l'acceuil
+7. Revenir à l'acceuil
 8. Quitter";
 
             try
@@ -428,9 +447,6 @@ namespace Test_projet
                             case 5:
                                 Item("Appréciation");
                                 break;
-                            case 6:
-                                Item("Bulletin");
-                                break;
                             case 8:
                                 break;
                         }
@@ -464,21 +480,19 @@ namespace Test_projet
                                 break;
 
                             case 4:
-                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
                                 ReadFile("Cote.txt");
                                 Console.ReadKey();
                                 break;
 
                             case 5:
-                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n ");
+                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
                                 ReadFile("Appreciation.txt");
                                 Console.ReadKey();
                                 break;
 
                             case 6:
-                                Console.WriteLine("Voici les différents bulletins : \n");
-                                ReadFile("Bulletin.txt");
-                                Console.ReadKey();
+                                Item("Bulletin");
                                 break;
 
                             case 7:

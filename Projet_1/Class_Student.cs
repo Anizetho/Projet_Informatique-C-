@@ -68,7 +68,8 @@ namespace Test_projet
                 Carnet += "\n";
             }
 
-            Console.WriteLine(Firstname + " " + Lastname + "\n \n" + Carnet + "\n" + "Moyenne : " + Average());
+            Console.Write(Firstname + " " + Lastname + "\n \n" + Carnet + "\n" + "Moyenne : " + Average());
+            Console.WriteLine("");
             Console.ReadKey();
         }
 
