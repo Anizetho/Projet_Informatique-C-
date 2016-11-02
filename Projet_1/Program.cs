@@ -81,7 +81,6 @@ namespace Test_projet
             string path = @"C:\Test_create_folder\Sous-Dossier\" + filetxt;
             String[] erreur = { "erreur" };
             string[][][] res = { };
-            int i = 0;
             string line = " ";
 
             // Read the file and display it line by line.
@@ -103,14 +102,10 @@ namespace Test_projet
 
 
 
-        static string[][] FindEvaluation(string filetxt, string name)
+        static List<List<string>> FindEvaluation(string filetxt, string name)
         {
             string path = @"C:\Test_create_folder\Sous-Dossier\" + filetxt;
-            string[] erreur = { "erreur" };
-            string[][] res = new string[2][]; // Initialisation du tableau
-            res[0] = new string[1];
-            res[0][0] = "empty";
-
+            List<List<string>> res = new List<List<string>>(); // création de la liste
             int i = 0;
             string line = " ";
 
@@ -125,28 +120,38 @@ namespace Test_projet
                 {
                     if (value == name)
                     {
-                        res[i] = new string[3]; //Plus que 2 ligne dans les fichier cote ou Appreciation et ca foire ! OutOfRange
-                        res[i] = new string[] { split[1], split[2], split[3] };
+                        List<string> var = new List<string>();
+                        var.Add(split[1]);
+                        var.Add(split[2]);
+                        var.Add(split[3]);
+                        res.Add(var);
                         i++;
                     }
                 }
+            }
+
+            if (i == 0)
+            {
+                List<string> empty = new List<string>();
+                empty.Add("empty");
+                res.Add(empty);
             }
             return res;
             //On retourne un tableau de type res = { {Cours1, Note1, ProfCours1}, {Cours2, Note2, ProfCours2 },...}
         }
 
 
-        static void GenBulletin(string[][] listApp, string[][] listCote, Student student)
+        static void GenBulletin(List<List<string>> listApp, List<List<string>> listCote, Student student)
         {
             if (listCote[0][0] != "empty")
             {
-                foreach (string[] cours in listCote)
+                foreach (List<string> cours in listCote)
                 {
                     //On recrée les profs
                     string teacher = cours[2];
                     string[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
                     Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
-                    //On recrée les activités
+                    //On recrée les activité
                     string activity = cours[0];
                     string[] dataActivity = FindObjectValue("Activity.txt", activity);
                     Activity Cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
@@ -159,7 +164,7 @@ namespace Test_projet
 
             if (listApp[0][0] != "empty")
             {
-                foreach (string[] cours in listApp)
+                foreach (List<string> cours in listApp)
                 {
                     //On recrée les profs
                     string teacher = cours[2];
@@ -371,29 +376,22 @@ namespace Test_projet
 
             else if (item == "Bulletin")
             {
-                Console.WriteLine("Affichier le Bulletin d'un étudiant");
+                Console.WriteLine("Afficher le Bulletin d'un étudiant");
                 Console.WriteLine("");
 
                 // On choisit l'étudiant pour lequel on souhaite voir le bulletin
-                // On récupère l'objet Student
-                Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n");
-                Console.Write("--> Nom de l'étudiant : ");
+                //On récupère l'objet Student
+                Console.Write("Veuillez indiquer le nom de l'étudiant concerné. \nAttention !! Le nom de l'étudiant doit déjà être encodé ! \n\n");
+                Console.Write("Nom de l'étudiant : ");
                 string nameOfStudent = Console.ReadLine();
                 String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
-                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
-                Console.WriteLine("L'étudiant a bien été trouvé.");
-                Console.WriteLine("");
+                Student nameStudent = new Student(dataStudent[1], dataStudent[0]);
+                Console.WriteLine("L'étudiant a bien été trouvé.\n");
 
-
-                string[][] listCote = FindEvaluation("Cote.txt", nameStudent.Lastname);
-                string[][] listApp = FindEvaluation("Appreciation.txt", nameStudent.Lastname);
+                List<List<string>> listCote = FindEvaluation("Cote.txt", nameStudent.Lastname);
+                List<List<string>> listApp = FindEvaluation("Appreciation.txt", nameStudent.Lastname);
 
                 GenBulletin(listApp, listCote, nameStudent);
-
-                Console.WriteLine("");
-                Console.WriteLine("Voici toutes les infos dont nous disposons actuellement.\nVous allez revenir au menu");
-                Console.ReadKey();
-                return;
             }
 
 
@@ -435,117 +433,146 @@ namespace Test_projet
 7. Revenir à l'acceuil
 8. Quitter";
 
-            try
+            Console.Clear();
+            int n = 0;
+
+            switch (n)
             {
-                Console.Clear();
-                Console.WriteLine(Accueil);
-                int n = (int.Parse(Console.ReadLine()));
-                Console.Clear();
-
-                switch (n)
-                {
-                    case 0:
-                        Console.Clear();
-                        Console.WriteLine(Accueil);
-
+                case 0:
+                    Console.Clear();
+                    Console.WriteLine(Accueil);
+                    try
+                    {
                         int var = int.Parse(Console.ReadLine());
 
                         if (var == 1) { goto case 1; }
                         if (var == 2) { goto case 2; }
-                        else { break; }
+                        else { Console.WriteLine("Ce choix n'est pas disponible, essayez un autre numéro"); Console.ReadKey(); goto case 0; }
+                    }
+                    catch (System.FormatException)
+                    { Console.WriteLine("Entrez un entier pour sélectionner votre choix"); Console.ReadKey(); goto case 0; }
 
-
-                    case 1:
-                        Console.Clear();
-                        Console.WriteLine(CreaObjet);
-
-                        int n2 = (int.Parse(Console.ReadLine()));
-                        Console.Clear();
-
-
-                        switch (n2)
+                case 1:
+                    Console.Clear();
+                    Console.WriteLine(CreaObjet);
+                    int n2 = -1;
+                    try
+                    {
+                        int entry = (int.Parse(Console.ReadLine()));
+                        if (entry == 1 || entry == 2 || entry == 3 || entry == 4 || entry == 5 || entry == 7 || entry == 8) { n2 = entry; }
+                        else
                         {
-                            case 1:
-                                Item("Teacher");
-                                break;
-                            case 2:
-                                Item("Student");
-                                break;
-                            case 3:
-                                Item("Activity");
-                                break;
-                            case 4:
-                                Item("Cote");
-                                break;
-                            case 5:
-                                Item("Appréciation");
-                                break;
-                            case 8:
-                                break;
+                            Console.WriteLine("Ce choix n'est pas disponible, essayez un autre numéro");
+                            Console.ReadKey();
+                            goto case 1;
                         }
-                        goto case 0;
+                    }
+                    catch (System.FormatException)
+                    { Console.WriteLine("Entrez un entier pour sélectionner votre choix"); Console.ReadKey(); goto case 1; }
 
-                    case 2:
-                        Console.Clear();
-                        Console.WriteLine(Listes);
+                    switch (n2)
+                    {
+                        case 1:
+                            Console.Clear();
+                            Item("Teacher");
+                            break;
+                        case 2:
+                            Console.Clear();
+                            Item("Student");
+                            break;
+                        case 3:
+                            Console.Clear();
+                            Item("Activity");
+                            break;
+                        case 4:
+                            Console.Clear();
+                            Item("Cote");
+                            break;
+                        case 5:
+                            Console.Clear();
+                            Item("Appréciation");
+                            break;
+                        case 8:
+                            break;
+                    }
+                    goto case 0;
 
-                        int n3 = (int.Parse(Console.ReadLine()));
-                        Console.Clear();
-
-                        switch (n3)
+                case 2:
+                    Console.Clear();
+                    Console.WriteLine(Listes);
+                    int n3 = -1;
+                    try
+                    {
+                        int entry = (int.Parse(Console.ReadLine()));
+                        if (entry == 1 || entry == 2 || entry == 3 || entry == 4 || entry == 5 || entry == 7 || entry == 6 || entry == 8) { n3 = entry; }
+                        else
                         {
-                            case 1:
-                                Console.WriteLine("Voici la liste des professeurs : \n");
-                                ReadFile("Teacher.txt");
-                                Console.ReadKey();
-                                break;
-
-                            case 2:
-                                Console.WriteLine("Voici la liste des étudiants : \n");
-                                ReadFile("Student.txt");
-                                Console.ReadKey();
-                                break;
-
-                            case 3:
-                                Console.WriteLine("Voici la liste des activités : \n");
-                                ReadFile("Activity.txt");
-                                Console.ReadKey();
-                                break;
-
-                            case 4:
-                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
-                                ReadFile("Cote.txt");
-                                Console.ReadKey();
-                                break;
-
-                            case 5:
-                                Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
-                                ReadFile("Appreciation.txt");
-                                Console.ReadKey();
-                                break;
-
-                            case 6:
-                                Item("Bulletin");
-                                break;
-
-                            case 7:
-                                Console.WriteLine("ok");
-                                break;
-
-                            case 8:
-                                return;
-
+                            Console.WriteLine("Ce choix n'est pas disponible, essayez un autre numéro");
+                            Console.ReadKey();
+                            goto case 2;
                         }
-                        goto case 0;
-                }
+                    }
+                    catch (System.FormatException)
+                    { Console.WriteLine("Entrez un entier pour sélectionner votre choix"); Console.ReadKey(); goto case 2; }
+
+                    switch (n3)
+                    {
+                        case 1:
+                            Console.Clear();
+                            Console.WriteLine("Voici la liste des professeurs : \n");
+                            ReadFile("Teacher.txt");
+                            Console.ReadKey();
+                            break;
+
+                        case 2:
+                            Console.Clear();
+                            Console.WriteLine("Voici la liste des étudiants : \n");
+                            ReadFile("Student.txt");
+                            Console.ReadKey();
+                            break;
+
+                        case 3:
+                            Console.Clear();
+                            Console.WriteLine("Voici la liste des activités : \n");
+                            ReadFile("Activity.txt");
+                            Console.ReadKey();
+                            break;
+
+                        case 4:
+                            Console.Clear();
+                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                            ReadFile("Cote.txt");
+                            Console.ReadKey();
+                            break;
+
+                        case 5:
+                            Console.Clear();
+                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                            ReadFile("Appreciation.txt");
+                            Console.ReadKey();
+                            break;
+
+                        case 6:
+                            Console.Clear();
+                            Item("Bulletin");
+                            break;
+
+                        case 7:
+                            Console.Clear();
+                            Console.WriteLine("ok");
+                            break;
+
+                        case 8:
+                            return;
+
+                    }
+                    goto case 0;
             }
-
-            catch (System.FormatException) { Console.WriteLine("Erreur"); }
-
         }
-
     }
 }
 
 // Questions : 
-// -> Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
+// -> Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2])); -> Pq cet ordre ?
+// -> On ne peut pas entre de float dans les cotes (juste des int)
+// -> Problème de création de fichiers -> Quand on lit un fichier (on va voir une liste de qqch), ensuite on sait plus écrire dedans (créer un nouveau prof, ...) 
