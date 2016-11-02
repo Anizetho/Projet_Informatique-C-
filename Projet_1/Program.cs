@@ -21,22 +21,26 @@ namespace Test_projet
                 String text = @"C:\Test_create_folder\Sous-Dossier\" + file;
 
                 string line = " ";
-                int counter = 0;
                 string res = "";
+                string[] split = { };
 
                 // Read the file and display it line by line.
                 System.IO.StreamReader var = new System.IO.StreamReader(text);
 
                 while ((line = var.ReadLine()) != null)
                 {
-                    Char sep = ':';
-                    String[] split = line.Split(sep);
+                    if (line != "")
+                    {
+                        string[] sep = { ":" };
+                        split = line.Split(sep, StringSplitOptions.RemoveEmptyEntries);
 
-                    res += "- ";
-                    foreach (string value in split)
-                    { res += value + " "; }
-                    res += "\n";
-                    counter++;
+                        Console.Write("- ");
+                        foreach (string value in split)
+                        {
+                            Console.Write(value + " ");
+                        }
+                        Console.WriteLine('\n');
+                    }
                 }
 
                 // Ecris ce qui a été lu dans le fichier sur la console.
@@ -50,9 +54,6 @@ namespace Test_projet
                 Console.WriteLine(e.Message);
                 return;
             }
-
-
-
         }
 
 
@@ -71,8 +72,6 @@ namespace Test_projet
             {
                 file.WriteLine(str);
             }
-
-
         }
 
 
@@ -81,9 +80,9 @@ namespace Test_projet
         {
             string path = @"C:\Test_create_folder\Sous-Dossier\" + filetxt;
             String[] erreur = { "erreur" };
-
-            int counter = 0;
-            string line;
+            string[][][] res = { };
+            int i = 0;
+            string line = " ";
 
             // Read the file and display it line by line.
             System.IO.StreamReader file = new System.IO.StreamReader(path);
@@ -92,14 +91,96 @@ namespace Test_projet
             while ((line = file.ReadLine()) != null)
             {
                 Char sep = ':';
-                String[] split = line.Split(sep);
-
-                if (split[1] == name) { return split; }
-                counter++;
+                string[] split = line.Split(sep);
+                foreach (string value in split)
+                {
+                    if (value == name) { return split; }
+                }
             }
             return erreur;
 
         }
+
+
+
+        static string[][] FindEvaluation(string filetxt, string name)
+        {
+            string path = @"C:\Test_create_folder\Sous-Dossier\" + filetxt;
+            string[] erreur = { "erreur" };
+            string[][] res = new string[2][]; // Initialisation du tableau
+            res[0] = new string[1];
+            res[0][0] = "empty";
+
+            int i = 0;
+            string line = " ";
+
+            // Read the file and display it line by line.
+            System.IO.StreamReader file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                Char sep = ':';
+                string[] split = line.Split(sep);
+                foreach (string value in split)
+                {
+                    if (value == name)
+                    {
+                        res[i] = new string[3]; //Plus que 2 ligne dans les fichier cote ou Appreciation et ca foire ! OutOfRange
+                        res[i] = new string[] { split[1], split[2], split[3] };
+                        i++;
+                    }
+                }
+            }
+            return res;
+            //On retourne un tableau de type res = { {Cours1, Note1, ProfCours1}, {Cours2, Note2, ProfCours2 },...}
+        }
+
+
+        static void GenBulletin(string[][] listApp, string[][] listCote, Student student)
+        {
+            if (listCote[0][0] != "empty")
+            {
+                foreach (string[] cours in listCote)
+                {
+                    //On recrée les profs
+                    string teacher = cours[2];
+                    string[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
+                    Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                    //On recrée les activités
+                    string activity = cours[0];
+                    string[] dataActivity = FindObjectValue("Activity.txt", activity);
+                    Activity Cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+
+                    Cote result = new Cote(Cours);
+                    result.setNote(int.Parse(cours[1]));
+                    student.AddEvaluation(result);
+                }
+            }
+
+            if (listApp[0][0] != "empty")
+            {
+                foreach (string[] cours in listApp)
+                {
+                    //On recrée les profs
+                    string teacher = cours[2];
+                    string[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
+                    Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                    //On recrée les activité
+                    string activity = cours[0];
+                    string[] dataActivity = FindObjectValue("Activity.txt", activity);
+                    Activity Cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
+
+                    Appreciation result = new Appreciation(Cours);
+                    result.setAppreciation(cours[1]);
+                    student.AddEvaluation(result);
+                }
+            }
+
+            if (listApp[0][0] != "empty" || listCote[0][0] != "empty") { student.Bulletin(); }
+            else { Console.WriteLine("pas de cote ou d'appreciation"); }
+
+        }
+
 
 
         static void Item(string item)
@@ -304,60 +385,12 @@ namespace Test_projet
                 Console.WriteLine("");
 
 
-                // On reprend la liste des activités auxquelles il a participé. 
-                Console.Write("Attention !! L'activité doit déjà être encodée ! \n");
-                Console.Write("--> Nom de l'activité : ");
-                string nameActivity = Console.ReadLine();
-                //Recréation de l'objet Activity 
-                String[] dataActivity = FindObjectValue("Activity.txt", nameActivity);
-                //Recréation de l'objet teacher
-                string teacher = dataActivity[3];
-                String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
-                Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
-                Console.WriteLine("L'activité a bien été trouvée.");
+                string[][] listCote = FindEvaluation("Cote.txt", nameStudent.Lastname);
+                string[][] listApp = FindEvaluation("Appreciation.txt", nameStudent.Lastname);
+
+                GenBulletin(listApp, listCote, nameStudent);
+
                 Console.WriteLine("");
-
-
-                // On reprend la cote de cette activité
-                String[] dataCote = FindObjectValue("Cote.txt", nameStudent.Lastname);
-                int points = int.Parse(dataCote[2]);
-                // Création d'une cote dans une certaine activité -> Rem. : on doit rentrer une "activity"
-                Cote cotecours = new Cote(cours);
-                cotecours.setNote(points);
-                Console.WriteLine("La cote pour l'activité '" + cours.name + "' a bien été trouvée. --> " + cotecours.Note());
-
-
-                // On reprend l'appréciation de cette activité
-                String[] dataAppreciation = FindObjectValue("Appreciation.txt", nameStudent.Lastname);
-                int appreciation = int.Parse(dataAppreciation[2]);
-                string appreciationletter = "";
-                for(int i=0 ; i<5 ; i++)
-                {
-                    if (appreciation == 4) { appreciationletter = "N"; }
-                    else if (appreciation == 8) { appreciationletter = "C"; }
-                    else if (appreciation == 12) { appreciationletter = "B"; }
-                    else if (appreciation == 16) { appreciationletter = "TB"; }
-                    else if (appreciation == 20) { appreciationletter = "X"; }
-                    else { Console.WriteLine("erreur -> L'Appréciation est introuvable"); }
-                }
-                Appreciation apprcours = new Appreciation(cours);
-                apprcours.setAppreciation(appreciationletter);
-                Console.WriteLine("L'appréciation pour l'activité '" + cours.name + "' a bien été trouvée. --> " + apprcours.Note());
-
-
-
-                // On ajoute la cote à la liste des cours
-                nameStudent.AddEvaluation(cotecours);
-                // On ajoute l'appréciation à la liste des cours
-                nameStudent.AddEvaluation(apprcours);
-
-
-                // On crée et on affiche le bulletin 
-                Console.WriteLine(" \nEn résumé, voici le buletin de : ");
-                nameStudent.Bulletin();
-
-
                 Console.WriteLine("Voici toutes les infos dont nous disposons actuellement.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
@@ -514,3 +547,5 @@ namespace Test_projet
     }
 }
 
+// Questions : 
+// -> Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
