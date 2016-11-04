@@ -183,7 +183,7 @@ namespace Test_projet
                     string[] dataActivity = FindObjectValue("Activity.txt", activity);
                     Activity Cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
 
-                    // On reprend l'appréciation de cette activité
+                    // On "retransforme" le int de l'appréciation en string
                     int appreciation = int.Parse(cours[1]);
                     string appreciationletter = "";
                     for (int i = 0; i < 5; i++)
@@ -287,6 +287,7 @@ namespace Test_projet
                 // Création de l'objet grâce aux valeurs données.
                 Activity Cours = new Activity(ECTS, Name, Code, Prof);
 
+                // On écrit dans le ficher : 1) Nombre d'ECTS 2) Nom du cours 3) Code du cours 4) Nom du prof qui gère ce cours
                 string str = Cours.ECTS + ":" + Cours.Name + ":" + Cours.code + ":" + Prof.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Activity.txt", str);
@@ -569,7 +570,7 @@ namespace Test_projet
 
                         case 3:
                             Console.Clear();
-                            Console.WriteLine("Voici la liste des activités : \n");
+                            Console.WriteLine("Voici la liste des activités reprenant dans l'ordre : \n 1) Nombre d'ECTS de l'activité \n 2) Nom de l'activité \n 3) Code de l'activité \n 4) Nom du prof qui gère cette activité \n");
                             ReadFile("Activity.txt");
                             Console.ReadKey();
                             break;
