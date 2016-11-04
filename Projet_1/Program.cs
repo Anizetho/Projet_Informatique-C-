@@ -42,7 +42,8 @@ namespace Test_projet
                         Console.WriteLine('\n');
                     }
                 }
-
+                // Fermeture du fichier
+                var.Close();
                 // Ecris ce qui a été lu dans le fichier sur la console.
                 Console.WriteLine(res);
                 Console.WriteLine("\nVous allez revenir au menu");
@@ -71,6 +72,8 @@ namespace Test_projet
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(pathString, true))
             {
                 file.WriteLine(str);
+                // Fermeture du fichier
+                file.Close();
             }
         }
 
@@ -96,12 +99,14 @@ namespace Test_projet
                     if (value == name) { return split; }
                 }
             }
+            // Fermeture du fichier
+            file.Close();
             return erreur;
 
         }
 
 
-
+        // Va chercher toutes les cotes et appréciations relatives à nom
         static List<List<string>> FindEvaluation(string filetxt, string name)
         {
             string path = @"C:\Test_create_folder\Sous-Dossier\" + filetxt;
@@ -136,6 +141,8 @@ namespace Test_projet
                 empty.Add("empty");
                 res.Add(empty);
             }
+            // Fermeture du fichier
+            file.Close();
             return res;
             //On retourne un tableau de type res = { {Cours1, Note1, ProfCours1}, {Cours2, Note2, ProfCours2 },...}
         }
@@ -143,6 +150,7 @@ namespace Test_projet
 
         static void GenBulletin(List<List<string>> listApp, List<List<string>> listCote, Student student)
         {
+            // 
             if (listCote[0][0] != "empty")
             {
                 foreach (List<string> cours in listCote)
@@ -150,7 +158,7 @@ namespace Test_projet
                     //On recrée les profs
                     string teacher = cours[2];
                     string[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                    Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                    Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
                     //On recrée les activité
                     string activity = cours[0];
                     string[] dataActivity = FindObjectValue("Activity.txt", activity);
@@ -169,19 +177,37 @@ namespace Test_projet
                     //On recrée les profs
                     string teacher = cours[2];
                     string[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                    Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                    Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
                     //On recrée les activité
                     string activity = cours[0];
                     string[] dataActivity = FindObjectValue("Activity.txt", activity);
                     Activity Cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
 
+                    // On reprend l'appréciation de cette activité
+                    int appreciation = int.Parse(cours[1]);
+                    string appreciationletter = "";
+                    for (int i = 0; i < 5; i++)
+                        {
+                            if (appreciation == 4) { appreciationletter = "N"; }
+                            else if (appreciation == 8) { appreciationletter = "C"; }
+                            else if (appreciation == 12) { appreciationletter = "B"; }
+                            else if (appreciation == 16) { appreciationletter = "TB"; }
+                            else if (appreciation == 20) { appreciationletter = "X"; }
+                            else { Console.WriteLine("erreur -> L'Appréciation est introuvable"); }
+                        }
+
                     Appreciation result = new Appreciation(Cours);
-                    result.setAppreciation(cours[1]);
+                    result.setAppreciation(appreciationletter);
                     student.AddEvaluation(result);
                 }
             }
 
-            if (listApp[0][0] != "empty" || listCote[0][0] != "empty") { student.Bulletin(); }
+            if (listApp[0][0] != "empty" || listCote[0][0] != "empty")
+            {
+                student.Bulletin();
+                Console.WriteLine("");
+                Console.WriteLine("Voici toutes les données dont nous disposons actuellement.\nVous allez revenir au menu");
+            }
             else { Console.WriteLine("pas de cote ou d'appreciation"); }
 
         }
@@ -194,6 +220,7 @@ namespace Test_projet
             if (item == "Teacher")
             {
                 Console.WriteLine("Créer un professeur");
+                Console.WriteLine(" ");
                 Console.Write("Prénom : ");
                 string firstname = Console.ReadLine();
                 Console.Write("Nom : ");
@@ -205,9 +232,10 @@ namespace Test_projet
                 Teacher Prof = new Teacher(firstname, lastname, salary);
 
                 //Ecriture dans le fichier 
-                string str = Prof.Firstname + ":" + Prof.Lastname + ":" + Prof.Salary + ":" + "\n";
+                string str = Prof.Lastname + ":" + Prof.Firstname + ":" + Prof.Salary + ":" + "\n";
                 WriteFile("Teacher.txt", str);
 
+                Console.WriteLine(" ");
                 Console.WriteLine("Le proffesseur a bien été créé dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
@@ -217,6 +245,7 @@ namespace Test_projet
             else if (item == "Student")
             {
                 Console.WriteLine("Créer un étudiant");
+                Console.WriteLine(" ");
                 Console.Write("Prénom : ");
                 string firstname = Console.ReadLine();
                 Console.Write("Nom : ");
@@ -225,9 +254,10 @@ namespace Test_projet
                 // Création de l'objet grâce aux valeurs données.
                 Student Etud = new Student(firstname, lastname);
 
-                string str = Etud.Firstname + ":" + Etud.Lastname + ":" + "\n";
+                string str = Etud.Lastname + ":" + Etud.Firstname + ":" + "\n";
                 WriteFile("Student.txt", str);
 
+                Console.WriteLine(" ");
                 Console.WriteLine("L'étudiant a bien été créé dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
@@ -239,6 +269,7 @@ namespace Test_projet
             else if (item == "Activity")
             {
                 Console.WriteLine("Créer une activité");
+                Console.WriteLine(" ");
                 Console.Write("Nombre ECTS : ");
                 int ECTS = int.Parse(Console.ReadLine());
                 Console.Write("Nom : ");
@@ -251,7 +282,7 @@ namespace Test_projet
 
                 //Recréation de l'objet teacher
                 String[] data = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(data[0], data[1], int.Parse(data[2]));
+                Teacher Prof = new Teacher(data[1], data[0], int.Parse(data[2]));
 
                 // Création de l'objet grâce aux valeurs données.
                 Activity Cours = new Activity(ECTS, Name, Code, Prof);
@@ -260,7 +291,8 @@ namespace Test_projet
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Activity.txt", str);
 
-                Console.WriteLine("L'activité a bien été créé dans la base de données.\nVous allez revenir au menu");
+                Console.WriteLine(" ");
+                Console.WriteLine("L'activité a bien été créée dans la base de données.\nVous allez revenir au menu");
                 Console.ReadKey();
                 return;
 
@@ -277,7 +309,7 @@ namespace Test_projet
                 Console.Write("--> Nom de l'étudiant : ");
                 string nameOfStudent = Console.ReadLine();
                 String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
-                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
+                Student nameStudent = new Student(dataStudent[1], dataStudent[0]);
                 Console.WriteLine("L'étudiant a bien été trouvé.");
                 Console.WriteLine("");
 
@@ -291,7 +323,7 @@ namespace Test_projet
                 //Recréation de l'objet teacher
                 string teacher = dataActivity[3];
                 String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
                 Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
                 Console.WriteLine("L'activité a bien été trouvée.");
                 Console.WriteLine("");
@@ -309,8 +341,8 @@ namespace Test_projet
                 // On ajoute la cote/l'appréciation à la liste des cours
                 nameStudent.AddEvaluation(cotecours);
 
-                // On souhaite afficher le nom de l'activité, le nom de l'élève, les points dans cette activité et le nom du prof de cette activité.
-                string str = cotecours.Activity.name + ":" +  nameStudent.Lastname + ":" + cotecours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
+                // On souhaite afficher le nom de l'élève, le nom de l'activité, les points dans cette activité et le nom du prof de cette activité.
+                string str = nameStudent.Lastname + ":" + cotecours.Activity.name + ":" + cotecours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Cote.txt", str);
 
@@ -330,8 +362,8 @@ namespace Test_projet
                 Console.Write("--> Nom de l'étudiant : ");
                 string nameOfStudent = Console.ReadLine();
                 String[] dataStudent = FindObjectValue("Student.txt", nameOfStudent);
-                Student nameStudent = new Student(dataStudent[0], dataStudent[1]);
-                Console.WriteLine("L'étudiant a bien été trouvée.");
+                Student nameStudent = new Student(dataStudent[1], dataStudent[0]);
+                Console.WriteLine("L'étudiant a bien été trouvé.");
                 Console.WriteLine("");
 
 
@@ -344,7 +376,7 @@ namespace Test_projet
                 //Recréation de l'objet teacher
                 string teacher = dataActivity[3];
                 String[] dataTeacher = FindObjectValue("Teacher.txt", teacher);
-                Teacher Prof = new Teacher(dataTeacher[0], dataTeacher[1], int.Parse(dataTeacher[2]));
+                Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2]));
                 Activity cours = new Activity(int.Parse(dataActivity[0]), dataActivity[1], dataActivity[2], Prof);
                 Console.WriteLine("L'activité a bien été trouvée.");
                 Console.WriteLine("");
@@ -362,8 +394,8 @@ namespace Test_projet
                 nameStudent.AddEvaluation(apprcours);
 
 
-                // On souhaite afficher le nom de l'activité, le nom de l'élève, les points dans cette activité et le nom du prof de cette activité.
-                string str = apprcours.Activity.name + ":" +  nameStudent.Lastname  + ":" + apprcours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
+                // On souhaite afficher le nom de l'élève, le nom de l'activité, les points dans cette activité et le nom du prof de cette activité.
+                string str = nameStudent.Lastname + ":" + apprcours.Activity.name + ":" + apprcours.Note() + ":" + cours.teacher.Lastname + ":" + "\n";
                 // Ecrire les données dans un fichier texte Activity
                 WriteFile("Appreciation.txt", str);
 
@@ -392,6 +424,7 @@ namespace Test_projet
                 List<List<string>> listApp = FindEvaluation("Appreciation.txt", nameStudent.Lastname);
 
                 GenBulletin(listApp, listCote, nameStudent);
+                return;
             }
 
 
@@ -422,7 +455,7 @@ namespace Test_projet
 8. Quitter";
 
             string Listes =
-@"********** Création des Objets ********** 
+@"********** Visualisation des listes ********** 
 1. Liste des professeurs 
 2. Liste des étudiants
 3. Liste des activités  
@@ -447,6 +480,7 @@ namespace Test_projet
 
                         if (var == 1) { goto case 1; }
                         if (var == 2) { goto case 2; }
+                        if (var == 8) { goto case 8; }
                         else { Console.WriteLine("Ce choix n'est pas disponible, essayez un autre numéro"); Console.ReadKey(); goto case 0; }
                     }
                     catch (System.FormatException)
@@ -493,7 +527,9 @@ namespace Test_projet
                             Item("Appréciation");
                             break;
                         case 8:
-                            break;
+                            Console.Clear();
+                            Console.WriteLine("Vous allez quitter l'application...");
+                            return;
                     }
                     goto case 0;
 
@@ -504,7 +540,7 @@ namespace Test_projet
                     try
                     {
                         int entry = (int.Parse(Console.ReadLine()));
-                        if (entry == 1 || entry == 2 || entry == 3 || entry == 4 || entry == 5 || entry == 7 || entry == 6 || entry == 8) { n3 = entry; }
+                        if (entry == 1 || entry == 2 || entry == 3 || entry == 4 || entry == 5 || entry == 6 || entry == 7 || entry == 8) { n3 = entry; }
                         else
                         {
                             Console.WriteLine("Ce choix n'est pas disponible, essayez un autre numéro");
@@ -540,14 +576,14 @@ namespace Test_projet
 
                         case 4:
                             Console.Clear();
-                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
                             ReadFile("Cote.txt");
                             Console.ReadKey();
                             break;
 
                         case 5:
                             Console.Clear();
-                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) L'activité concernée \n 2) Nom de l'élève \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
+                            Console.WriteLine("Voici la liste reprenant dans l'ordre : \n 1) Nom de l'élève \n 2) L'activité concernée \n 3) Les points de l'élève dans cette activité \n 4) Le nom du prof qui gère cette activité \n");
                             ReadFile("Appreciation.txt");
                             Console.ReadKey();
                             break;
@@ -555,6 +591,7 @@ namespace Test_projet
                         case 6:
                             Console.Clear();
                             Item("Bulletin");
+                            Console.ReadKey();
                             break;
 
                         case 7:
@@ -563,16 +600,20 @@ namespace Test_projet
                             break;
 
                         case 8:
+                            Console.Clear();
+                            Console.WriteLine("Vous allez quitter l'application...");
                             return;
 
                     }
                     goto case 0;
+
+                case 8:
+                    Console.Clear();
+                    Console.WriteLine("Vous allez quitter l'application...");
+                    break;
             }
         }
     }
 }
 
-// Questions : 
-// -> Teacher Prof = new Teacher(dataTeacher[1], dataTeacher[0], int.Parse(dataTeacher[2])); -> Pq cet ordre ?
-// -> On ne peut pas entre de float dans les cotes (juste des int)
-// -> Problème de création de fichiers -> Quand on lit un fichier (on va voir une liste de qqch), ensuite on sait plus écrire dedans (créer un nouveau prof, ...) 
+// Le bon code
